@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clippy Control Board</title>
+<style>
+  :root { color-scheme: dark; --bg:#14161b; --card:#1d2027; --line:#2c3039; --txt:#e8eaf0; --mut:#9aa0ad; --acc:#ffd54a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt); font: 15px/1.4 "Segoe UI", system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 2; }
+  header h1 { font-size: 18px; margin: 0; }
+  header h1 span { color: var(--acc); }
+  #status { margin-left: auto; display: flex; align-items: center; gap: 8px; color: var(--mut); font-size: 13px; }
+  #dot { width: 10px; height: 10px; border-radius: 50%; background: #777; }
+  #dot.ok { background: #45d67a; } #dot.bad { background: #e5484d; }
+  main { padding: 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); max-width: 1500px; margin: 0 auto; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .09em; color: var(--mut); margin: 0 0 10px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 8px; }
+  button { font: inherit; color: var(--txt); background: #262a33; border: 1px solid var(--line); border-radius: 9px; padding: 10px 28px 10px 10px; cursor: pointer; text-align: left; position: relative; transition: background .1s, transform .05s; }
+  button:hover { background: #2f3440; }
+  button:active, button.flash { transform: scale(.96); background: #3a4150; }
+  button.big { grid-column: 1 / -1; background: linear-gradient(135deg, #ffd54a, #ffb347); color: #1a1600; font-weight: 600; font-size: 16px; }
+  button.big:hover { background: linear-gradient(135deg, #ffe07a, #ffc370); }
+  button .k { position: absolute; right: 7px; top: 7px; font: 11px/1 ui-monospace, Consolas, monospace; color: var(--mut); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; }
+  button.big .k { color: #4a3f00; border-color: #b58f00; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .row button { flex: 1; text-align: center; padding-right: 10px; }
+  .row.keys button { padding-right: 26px; }
+  textarea, input[type=text] { width: 100%; background: #12141a; color: var(--txt); border: 1px solid var(--line); border-radius: 9px; padding: 10px; font: inherit; }
+  textarea { min-height: 96px; resize: vertical; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chips button { padding: 5px 10px; font-size: 13px; border-radius: 999px; }
+  label.sw { display: flex; align-items: center; gap: 10px; padding: 8px 4px; cursor: pointer; }
+  label.sw input { width: 18px; height: 18px; accent-color: var(--acc); }
+  .hint { color: var(--mut); font-size: 12.5px; margin-top: 8px; line-height: 1.5; }
+  code { background: #12141a; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>&#128206; <span>Clippy</span> Control Board</h1>
+  <div id="status"><span id="dot"></span><span id="statusText">connecting&hellip;</span></div>
+</header>
+<main>
+  <section>
+    <h2>Classic Clippy</h2>
+    <div class="grid">
+      <button class="big" data-action="letter" data-key="1">It looks like you're writing a letter&hellip;<span class="k">1</span></button>
+      <button data-action="attention" data-key="2">Knock knock<span class="k">2</span></button>
+      <button data-action="greet" data-key="3">Greet / wave<span class="k">3</span></button>
+      <button data-action="think" data-key="4">Thinking<span class="k">4</span></button>
+      <button data-action="writing" data-key="5">Writing<span class="k">5</span></button>
+      <button data-action="search" data-key="6">Searching<span class="k">6</span></button>
+      <button data-action="save" data-key="7">Save (floppy)<span class="k">7</span></button>
+      <button data-action="mail" data-key="8">Send mail<span class="k">8</span></button>
+      <button data-action="explain" data-key="9">Explain / point<span class="k">9</span></button>
+      <button data-action="artsy" data-key="0">Get artsy<span class="k">0</span></button>
+      <button data-action="techy" data-key="-">Get techy (atom)<span class="k">-</span></button>
+      <button data-action="pile" data-key="=">Rope pile<span class="k">=</span></button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reactions</h2>
+    <div class="grid">
+      <button data-action="celebrate" data-key="q">Celebrate<span class="k">q</span></button>
+      <button data-action="alert" data-key="w">Alert !<span class="k">w</span></button>
+      <button data-action="idea" data-key="e">Idea (bulb)<span class="k">e</span></button>
+      <button data-action="confused" data-key="r">Confused ?<span class="k">r</span></button>
+      <button data-action="check" data-key="t">Check mark<span class="k">t</span></button>
+      <button data-action="love" data-key="y">Love (heart)<span class="k">y</span></button>
+      <button data-action="laugh" data-key="u">Laugh<span class="k">u</span></button>
+      <button data-action="sad" data-key="i">Sad<span class="k">i</span></button>
+      <button data-action="wink" data-key="o">Wink<span class="k">o</span></button>
+      <button data-action="nod" data-key="p">Nod yes<span class="k">p</span></button>
+      <button data-action="no" data-key="[">Shake no<span class="k">[</span></button>
+      <button data-action="dance" data-key="]">Dance<span class="k">]</span></button>
+      <button data-action="rollEyes" data-key="\">Roll eyes<span class="k">\</span></button>
+      <button data-action="sixseven" data-key="n">6-7<span class="k">n</span></button>
+      <button data-action="snooze" data-key="z">Snooze (sleeps)<span class="k">z</span></button>
+      <button data-action="wake" data-key="x">Wake up<span class="k">x</span></button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Idle bits</h2>
+    <div class="grid">
+      <button data-action="lookAround" data-key="a">Look around<span class="k">a</span></button>
+      <button data-action="browRaise" data-key="s">Eyebrow raise<span class="k">s</span></button>
+      <button data-action="sway" data-key="d">Side to side<span class="k">d</span></button>
+      <button data-action="tap" data-key="f">Finger tap<span class="k">f</span></button>
+      <button data-action="watch" data-key="g">Check watch<span class="k">g</span></button>
+    </div>
+    <h2 style="margin-top:14px">Look</h2>
+    <div class="row keys">
+      <button data-action="look" data-args='{"dir":"camera"}' data-key="c">At camera<span class="k">c</span></button>
+      <button data-action="look" data-args='{"dir":"left"}'>Left</button>
+      <button data-action="look" data-args='{"dir":"right"}'>Right</button>
+      <button data-action="look" data-args='{"dir":"up"}'>Up</button>
+      <button data-action="look" data-args='{"dir":"down"}'>Down</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Position</h2>
+    <div class="row">
+      <button data-action="move" data-args='{"pos":"left"}'>Left</button>
+      <button data-action="move" data-args='{"pos":"centerLeft"}'>Center-left</button>
+      <button data-action="move" data-args='{"pos":"center"}'>Center</button>
+      <button data-action="move" data-args='{"pos":"centerRight"}'>Center-right</button>
+      <button data-action="move" data-args='{"pos":"right"}'>Right</button>
+    </div>
+    <h2 style="margin-top:14px">Size</h2>
+    <div class="row">
+      <button data-action="size" data-args='{"scale":0.8}'>Small</button>
+      <button data-action="size" data-args='{"scale":1.15}'>Normal</button>
+      <button data-action="size" data-args='{"scale":1.5}'>Large</button>
+      <button data-action="size" data-args='{"scale":2.1}'>Huge</button>
+    </div>
+    <h2 style="margin-top:14px">Visibility</h2>
+    <div class="row keys">
+      <button data-action="goodbye" data-key="h">Goodbye (hide)<span class="k">h</span></button>
+      <button data-action="show" data-key="j">Come back<span class="k">j</span></button>
+      <button data-action="stop" data-key="Escape">Stop / reset<span class="k">Esc</span></button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Say something</h2>
+    <textarea id="sayText" placeholder="What Clippy says. Lines starting with '- ' become the classic bullet options.">It looks like you're trying to stream.
+
+Would you like help?
+- Get help with streaming
+- Just stream without help
+- Don't show me this tip again</textarea>
+    <div class="row" style="margin-top:8px">
+      <button id="sayBtn" style="background:#2d6cdf;border-color:#2d6cdf">Say it (Ctrl+Enter)</button>
+      <button data-action="hideBalloon">Hide balloon</button>
+    </div>
+    <div class="chips" id="chips">
+      <button data-say="Would you like help?">Would you like help?</button>
+      <button data-say="I'm here if you need me!">I'm here if you need me!</button>
+      <button data-say="Did you know? You can press F1 for help.">Did you know?</button>
+      <button data-say="Hello, chat!">Hello, chat!</button>
+      <button data-say="Don't forget to hydrate.">Hydrate</button>
+      <button data-say="BRB!">BRB!</button>
+      <button data-say="Thanks for the follow!">Thanks for the follow!</button>
+    </div>
+    <h2 style="margin-top:16px">"It looks like you're&hellip;"</h2>
+    <div class="row">
+      <input type="text" id="activity" placeholder="trying to beat this boss" value="trying to stream">
+      <button id="letterBtn" style="flex:0 0 auto">Knock &amp; ask</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Settings</h2>
+    <label class="sw"><input type="checkbox" id="autoIdle" checked> Auto idle antics (looks around, taps, naps between actions)</label>
+    <label class="sw"><input type="checkbox" id="sound"> Sound effects (synthesized, played by the OBS browser source)</label>
+    <label class="sw"><input type="checkbox" id="bg" checked> Show the Bliss background (off = transparent overlay)</label>
+    <div class="hint">
+      OBS: add a <b>Browser</b> source with URL <code id="bgUrl">http://127.0.0.1:8787/background.html</code>, 1920 x 1080, and put your camera (with chroma key or background removal) above it.<br>
+      Add this board inside OBS: View &rsaquo; Docks &rsaquo; Custom Browser Docks &rsaquo; URL <code id="boardUrl">http://127.0.0.1:8787/</code>.<br>
+      Stream Deck / hotkeys: open <code>/do/&lt;action&gt;</code>, e.g. <code id="doUrl">http://127.0.0.1:8787/do/greet</code>. Keyboard shortcuts work while this page is focused.
+    </div>
+  </section>
+</main>
+<script>
+(function () {
+  const base = location.protocol.indexOf('http') === 0 ? '' : 'http://127.0.0.1:8787';
+  const origin = base || location.origin;
+  document.getElementById('bgUrl').textContent = origin + '/background.html';
+  document.getElementById('boardUrl').textContent = origin + '/';
+  document.getElementById('doUrl').textContent = origin + '/do/greet';
+  let bc = null; try { bc = new BroadcastChannel('clippy-board'); } catch (e) {}
+  const dot = document.getElementById('dot'), statusText = document.getElementById('statusText');
+  function setStatus(ok, text) { dot.className = ok ? 'ok' : 'bad'; statusText.textContent = text || (ok ? 'server connected' : 'server not reachable - run start.cmd'); }
+
+  async function send(msg) {
+    let ok = false;
+    try { const r = await fetch(base + '/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg) }); ok = r.ok; } catch (e) {}
+    setStatus(ok);
+    if (bc) bc.postMessage(msg);                                                  // same-browser fallback
+    try { localStorage.setItem('clippy-msg', JSON.stringify({ t: Date.now(), msg: msg })); } catch (e) {}
+  }
+  function flash(b) { b.classList.add('flash'); setTimeout(() => b.classList.remove('flash'), 160); }
+
+  document.querySelectorAll('button[data-action]').forEach(b => b.addEventListener('click', () => {
+    flash(b);
+    send(Object.assign({ action: b.dataset.action }, b.dataset.args ? JSON.parse(b.dataset.args) : {}));
+  }));
+  const keys = {};
+  document.querySelectorAll('button[data-key]').forEach(b => { keys[b.dataset.key] = b; });
+  addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea') && e.key !== 'Escape') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const b = keys[e.key]; if (b) { e.preventDefault(); b.click(); }
+  });
+
+  const ta = document.getElementById('sayText');
+  function sayIt() {
+    const lines = ta.value.split('\n').map(s => s.replace(/\s+$/, ''));
+    const opts = lines.filter(l => /^\s*[-*•]\s+/.test(l)).map(l => l.replace(/^\s*[-*•]\s+/, ''));
+    const body = lines.filter(l => !/^\s*[-*•]\s+/.test(l)).join('\n').trim();
+    if (!body) return;
+    send({ action: 'say', text: body, options: opts });
+  }
+  document.getElementById('sayBtn').addEventListener('click', sayIt);
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); sayIt(); } });
+  document.querySelectorAll('#chips button').forEach(b => b.addEventListener('click', () => { flash(b); send({ action: 'say', text: b.dataset.say }); }));
+  document.getElementById('letterBtn').addEventListener('click', () => {
+    const activity = document.getElementById('activity').value.trim() || 'writing a letter';
+    send({ action: 'letter', activity: activity });
+  });
+
+  for (const id of ['autoIdle', 'sound']) document.getElementById(id).addEventListener('change', e => send({ action: 'setting', key: id, value: e.target.checked }));
+  document.getElementById('bg').addEventListener('change', e => send({ action: 'bg', value: e.target.checked }));
+
+  async function sync() {
+    try {
+      const s = await (await fetch(base + '/state')).json();
+      document.getElementById('autoIdle').checked = !!s.settings.autoIdle;
+      document.getElementById('sound').checked = !!s.settings.sound;
+      document.getElementById('bg').checked = s.bg !== false;
+      setStatus(true);
+    } catch (e) { setStatus(false); }
+  }
+  sync(); setInterval(sync, 5000);
+})();
+</script>
+</body>
+</html>

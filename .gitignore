@@ -1,0 +1,6 @@
+# local tooling and caches
+.claude/
+__pycache__/
+*.pyc
+Thumbs.db
+.DS_Store
